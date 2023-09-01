@@ -4,7 +4,7 @@ This script allows you to download hash ranges of compromised passwords from the
 ## Usage
 ### Prerequisites
 * Python 3.x
-* Dependencies can be installed using pip install requests tqdm
+* Dependencies can be installed using `pip install requests tqdm`
 
 ### Running the Script
 
