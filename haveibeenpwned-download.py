@@ -7,10 +7,13 @@ NUM_THREADS = 16  # You can adjust the number of threads as needed
 
 
 def download_range(session, current_hash):
-    url = f"https://api.pwnedpasswords.com/range/{get_hash_range(current_hash)}"
+    hash_range = get_hash_range(current_hash)
+    url = f"https://api.pwnedpasswords.com/range/{hash_range}"
     response = session.get(url)
     content = response.text
-    return content
+    # add current_hash to the beginning of each line
+    content = "\n".join([f"{hash_range}{line}" for line in content.splitlines()])
+    return content + "\n"
 
 
 def download_ranges_concurrently(output_file_path, num_threads=NUM_THREADS):
@@ -18,9 +21,10 @@ def download_ranges_concurrently(output_file_path, num_threads=NUM_THREADS):
     with open(output_file_path, "w") as output_file:
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             futures = []
-            pbar = tqdm(total=1024 * 1024, desc="Downloading")
+            limit = 1024 * 1024
+            pbar = tqdm(total=limit, desc="Downloading")
 
-            for current_hash in range(1024 * 1024):
+            for current_hash in range(limit):
                 future = executor.submit(download_range, client, current_hash)
                 future.add_done_callback(lambda f: futures.remove(f))  # Remove completed future
                 futures.append(future)
